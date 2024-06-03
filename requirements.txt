@@ -1,0 +1,5 @@
+streamlit
+hugchat
+pandas
+python-docx
+PyPDF2
