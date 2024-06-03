@@ -11,7 +11,6 @@ import os
 user_input = ""  # Initialize user_input as an empty string
 chat_history = []  # Initialize chat history list
 file_updated = False  # Flag to track if a file or .db has been updated
-messages = []  # Initialize chat history list
 
 # App title
 st.set_page_config(page_title="Care System")
@@ -33,8 +32,8 @@ with st.sidebar:
             st.warning('Please enter your credentials!', icon='⚠️')
         else:
             st.success('Proceed to entering your prompt message!', icon='  ')
-    st.markdown(
-        'Learn how to build this app in this [blog]('The Exact Solution of Pi and What it Means website [blog](https://exact-solution-of-pi.onrender.com/)')
+    st.markdown('Learn how to build this app in this [blog](https://exact-solution-of-pi.onrender.com/)')
+
 # Store LLM generated responses
 if "messages" not in st.session_state.keys():
     st.session_state.messages = [
@@ -46,8 +45,6 @@ for message in st.session_state.messages:
         st.write(message["content"])
 
 # Function for generating LLM response
-
-
 def generate_response(prompt_input, email, passwd):
     # Hugging Face Login
     sign = Login(email, passwd)
@@ -55,7 +52,6 @@ def generate_response(prompt_input, email, passwd):
     # Create ChatBot
     chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
     return chatbot.chat(prompt_input)
-
 
 # User-provided prompt
 if prompt := st.chat_input(disabled=not (hf_email and hf_pass)):
@@ -71,7 +67,6 @@ if st.session_state.messages[-1]["role"] != "assistant":
             st.write(response)
     message = {"role": "assistant", "content": response}
     st.session_state.messages.append(message)
-# User-provided prompt
 
 # Handle language input
 if "language" not in st.session_state:
@@ -200,4 +195,3 @@ if file_updated or user_input:
 if not file_updated and not user_input:
     st.warning(
         "Please upload a document, enter a text, provide a URL, or a YouTube video to generate a response.")
-
