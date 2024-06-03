@@ -1,0 +1,170 @@
+[
+    {
+        "label": "streamlit",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "streamlit",
+        "description": "streamlit",
+        "detail": "streamlit",
+        "documentation": {}
+    },
+    {
+        "label": "hugchat",
+        "importPath": "hugchat",
+        "description": "hugchat",
+        "isExtraImport": true,
+        "detail": "hugchat",
+        "documentation": {}
+    },
+    {
+        "label": "Login",
+        "importPath": "hugchat.login",
+        "description": "hugchat.login",
+        "isExtraImport": true,
+        "detail": "hugchat.login",
+        "documentation": {}
+    },
+    {
+        "label": "pandas",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "pandas",
+        "description": "pandas",
+        "detail": "pandas",
+        "documentation": {}
+    },
+    {
+        "label": "docx",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "docx",
+        "description": "docx",
+        "detail": "docx",
+        "documentation": {}
+    },
+    {
+        "label": "PdfReader",
+        "importPath": "PyPDF2",
+        "description": "PyPDF2",
+        "isExtraImport": true,
+        "detail": "PyPDF2",
+        "documentation": {}
+    },
+    {
+        "label": "sqlite3",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "sqlite3",
+        "description": "sqlite3",
+        "detail": "sqlite3",
+        "documentation": {}
+    },
+    {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "generate_response",
+        "kind": 2,
+        "importPath": "EVV",
+        "description": "EVV",
+        "peekOfCode": "def generate_response(prompt_input, email, passwd):\n    # Hugging Face Login\n    sign = Login(email, passwd)\n    cookies = sign.login()\n    # Create ChatBot\n    chatbot = hugchat.ChatBot(cookies=cookies.get_dict())\n    return chatbot.chat(prompt_input)\n# User-provided prompt\nif prompt := st.chat_input(disabled=not (hf_email and hf_pass)):\n    st.session_state.messages.append({\"role\": \"user\", \"content\": prompt})",
+        "detail": "EVV",
+        "documentation": {}
+    },
+    {
+        "label": "user_input",
+        "kind": 5,
+        "importPath": "EVV",
+        "description": "EVV",
+        "peekOfCode": "user_input = \"\"  # Initialize user_input as an empty string\nchat_history = []  # Initialize chat history list\nfile_updated = False  # Flag to track if a file or .db has been updated\nmessages = []  # Initialize chat history list\n# App title\nst.set_page_config(page_title=\"Care System\")\n# Streamlit UI components\nst.title(\"EVV Provider Care System\")\n# Hugging Face Credentials\nwith st.sidebar:",
+        "detail": "EVV",
+        "documentation": {}
+    },
+    {
+        "label": "chat_history",
+        "kind": 5,
+        "importPath": "EVV",
+        "description": "EVV",
+        "peekOfCode": "chat_history = []  # Initialize chat history list\nfile_updated = False  # Flag to track if a file or .db has been updated\nmessages = []  # Initialize chat history list\n# App title\nst.set_page_config(page_title=\"Care System\")\n# Streamlit UI components\nst.title(\"EVV Provider Care System\")\n# Hugging Face Credentials\nwith st.sidebar:\n    st.title('Care System')",
+        "detail": "EVV",
+        "documentation": {}
+    },
+    {
+        "label": "file_updated",
+        "kind": 5,
+        "importPath": "EVV",
+        "description": "EVV",
+        "peekOfCode": "file_updated = False  # Flag to track if a file or .db has been updated\nmessages = []  # Initialize chat history list\n# App title\nst.set_page_config(page_title=\"Care System\")\n# Streamlit UI components\nst.title(\"EVV Provider Care System\")\n# Hugging Face Credentials\nwith st.sidebar:\n    st.title('Care System')\n    if ('EMAIL' in st.secrets) and ('PASS' in st.secrets):",
+        "detail": "EVV",
+        "documentation": {}
+    },
+    {
+        "label": "messages",
+        "kind": 5,
+        "importPath": "EVV",
+        "description": "EVV",
+        "peekOfCode": "messages = []  # Initialize chat history list\n# App title\nst.set_page_config(page_title=\"Care System\")\n# Streamlit UI components\nst.title(\"EVV Provider Care System\")\n# Hugging Face Credentials\nwith st.sidebar:\n    st.title('Care System')\n    if ('EMAIL' in st.secrets) and ('PASS' in st.secrets):\n        st.success('You are All System Go and Ready for Analysis!', icon='✅')",
+        "detail": "EVV",
+        "documentation": {}
+    },
+    {
+        "label": "uploaded_db_file",
+        "kind": 5,
+        "importPath": "EVV",
+        "description": "EVV",
+        "peekOfCode": "uploaded_db_file = st.sidebar.file_uploader(\n    \"Upload a .db file\", type=[\"db\"], key=\"db_file\")\ngoogle_sheets_id = st.sidebar.text_input(\n    \"Enter Google Sheets ID:\", key=\"google_sheets_id\")\n# User input: Upload multiple documents\nuploaded_files = st.sidebar.file_uploader(\n    \"Upload multiple documents\", accept_multiple_files=True)\n# Process uploaded documents\nif uploaded_files:\n    file_updated = True",
+        "detail": "EVV",
+        "documentation": {}
+    },
+    {
+        "label": "google_sheets_id",
+        "kind": 5,
+        "importPath": "EVV",
+        "description": "EVV",
+        "peekOfCode": "google_sheets_id = st.sidebar.text_input(\n    \"Enter Google Sheets ID:\", key=\"google_sheets_id\")\n# User input: Upload multiple documents\nuploaded_files = st.sidebar.file_uploader(\n    \"Upload multiple documents\", accept_multiple_files=True)\n# Process uploaded documents\nif uploaded_files:\n    file_updated = True\n    for idx, uploaded_file in enumerate(uploaded_files):\n        file_type = uploaded_file.type",
+        "detail": "EVV",
+        "documentation": {}
+    },
+    {
+        "label": "uploaded_files",
+        "kind": 5,
+        "importPath": "EVV",
+        "description": "EVV",
+        "peekOfCode": "uploaded_files = st.sidebar.file_uploader(\n    \"Upload multiple documents\", accept_multiple_files=True)\n# Process uploaded documents\nif uploaded_files:\n    file_updated = True\n    for idx, uploaded_file in enumerate(uploaded_files):\n        file_type = uploaded_file.type\n        if file_type == 'text/plain':\n            document_text = uploaded_file.getvalue().decode(\"utf-8\", errors='replace')\n            user_input += document_text",
+        "detail": "EVV",
+        "documentation": {}
+    },
+    {
+        "label": "url_input",
+        "kind": 5,
+        "importPath": "EVV",
+        "description": "EVV",
+        "peekOfCode": "url_input = st.text_input(\"Enter a URL:\", key=\"url_input\")\nif url_input:\n    user_input += f\"URL: {url_input}\\n\"\n# YouTube video input\nyoutube_video_input = st.text_input(\n    \"Enter a YouTube video URL:\", key=\"youtube_video_input\")\nif youtube_video_input:\n    user_input += f\"YouTube Video: {youtube_video_input}\\n\"\n# Initialize Hugchat\nchatbot = None",
+        "detail": "EVV",
+        "documentation": {}
+    },
+    {
+        "label": "youtube_video_input",
+        "kind": 5,
+        "importPath": "EVV",
+        "description": "EVV",
+        "peekOfCode": "youtube_video_input = st.text_input(\n    \"Enter a YouTube video URL:\", key=\"youtube_video_input\")\nif youtube_video_input:\n    user_input += f\"YouTube Video: {youtube_video_input}\\n\"\n# Initialize Hugchat\nchatbot = None\n# Generate Response button\nif file_updated or user_input:\n    if st.button(\"Generate Response\", key=\"generate_response_button\"):\n        with st.spinner(\"Thinking...\"):",
+        "detail": "EVV",
+        "documentation": {}
+    },
+    {
+        "label": "chatbot",
+        "kind": 5,
+        "importPath": "EVV",
+        "description": "EVV",
+        "peekOfCode": "chatbot = None\n# Generate Response button\nif file_updated or user_input:\n    if st.button(\"Generate Response\", key=\"generate_response_button\"):\n        with st.spinner(\"Thinking...\"):\n            # Hugging Face Login\n            sign = Login(hf_email, hf_pass)\n            cookies = sign.login()\n            # Initialize Hugchat with credentials\n            chatbot = hugchat.ChatBot(cookies=cookies.get_dict())",
+        "detail": "EVV",
+        "documentation": {}
+    }
+]
