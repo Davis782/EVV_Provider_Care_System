@@ -34,8 +34,7 @@ with st.sidebar:
         else:
             st.success('Proceed to entering your prompt message!', icon='  ')
     st.markdown(
-        'Learn how to build this app in this [blog](
-    'The Exact Solution of Pi and What it Means website [blog](https://exact-solution-of-pi.onrender.com/)')
+        'Learn how to build this app in this [blog]('The Exact Solution of Pi and What it Means website [blog](https://exact-solution-of-pi.onrender.com/)')
 # Store LLM generated responses
 if "messages" not in st.session_state.keys():
     st.session_state.messages = [
