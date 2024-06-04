@@ -11,6 +11,7 @@ import os
 user_input = ""  # Initialize user_input as an empty string
 chat_history = []  # Initialize chat history list
 file_updated = False  # Flag to track if a file or .db has been updated
+messages = []  # Initialize chat history list
 
 # App title
 st.set_page_config(page_title="Care System")
@@ -32,7 +33,9 @@ with st.sidebar:
             st.warning('Please enter your credentials!', icon='⚠️')
         else:
             st.success('Proceed to entering your prompt message!', icon='  ')
-    st.markdown('The Exact Solution of Pi and What it Means website [blog](https://exact-solution-of-pi.onrender.com/)')
+    st.markdown(
+        'The Exact Solution of Pi and What it Means website [blog](https://exact-solution-of-pi.onrender.com/)')
+
 
 # Store LLM generated responses
 if "messages" not in st.session_state.keys():
@@ -45,6 +48,8 @@ for message in st.session_state.messages:
         st.write(message["content"])
 
 # Function for generating LLM response
+
+
 def generate_response(prompt_input, email, passwd):
     # Hugging Face Login
     sign = Login(email, passwd)
@@ -52,6 +57,7 @@ def generate_response(prompt_input, email, passwd):
     # Create ChatBot
     chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
     return chatbot.chat(prompt_input)
+
 
 # User-provided prompt
 if prompt := st.chat_input(disabled=not (hf_email and hf_pass)):
@@ -116,11 +122,29 @@ url_input = st.text_input("Enter a URL:", key="url_input")
 if url_input:
     user_input += f"URL: {url_input}\n"
 
-# YouTube video input
+# Define the website URL for video transcript
+website_url = 'https://transcriptal.com/'
+
+# Create an iframe and embed it in the Streamlit app
+iframe_html = f'<iframe src="{website_url}" width="700" height="450"></iframe>'
+
+# Display the YouTube video URL input field
 youtube_video_input = st.text_input(
     "Enter a YouTube video URL:", key="youtube_video_input")
+
+# Check if the user has entered a YouTube video URL
 if youtube_video_input:
-    user_input += f"YouTube Video: {youtube_video_input}\n"
+    # Embed the website with the YouTube video
+    st.markdown(iframe_html, unsafe_allow_html=True)
+    # Display the YouTube video URL
+    st.write(f"YouTube Video URL: {youtube_video_input}")
+
+    # Add functionality to execute transcript for the YouTube video here
+    # This can include calling an API or service to generate the transcript
+
+    # For demonstration purposes, you can display a placeholder transcript
+    # YouTube video input
+    st.write("Transcript: This is a placeholder transcript for the YouTube video.")
 
 # Initialize Hugchat
 chatbot = None
@@ -143,7 +167,7 @@ if file_updated or user_input:
             # Display chat history
             st.subheader("Chat History")
             for sender, message in chat_history:
-                st.text(f"{sender}: {message}")
+                st.text_area(f"{sender}: {message}")
 
     # Get the email input from the user
     email = st.text_input("Enter your email address:", key="email_input")
