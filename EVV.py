@@ -63,15 +63,19 @@ if prompt := st.chat_input(disabled=not (hf_email and hf_pass)):
     with st.chat_message("user"):
         st.write(prompt)
 
+
 # Function to insert line breaks into long strings
 def insert_line_breaks(text, max_line_length=75):
     """Insert line breaks into long strings."""
-    lines = []
-    for i in range(0, len(text), max_line_length):
-        lines.append(text[i:i+max_line_length])
-    return '\n'.join(lines)
-
-# Initialize variables and other parts of the code remain the same as before
+    if isinstance(text, str):
+        lines = []
+        for i in range(0, len(text), max_line_length):
+            lines.append(text[i:i+max_line_length])
+        return '\n'.join(lines)
+    elif isinstance(text, Message):  # Assuming Message is the type of the response object
+        return text  # Return the Message object as it is
+    else:
+        return str(text)  # Convert to string if the type is not recognized
 
 # Generate a new response if last message is not from assistant
 if st.session_state.messages[-1]["role"] != "assistant":
