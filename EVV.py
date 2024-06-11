@@ -1,6 +1,7 @@
 import streamlit as st
 from hugchat import hugchat
 from hugchat.login import Login
+from hugchat.message import ChatError  # Import ChatError class
 import pandas as pd
 import docx
 from PyPDF2 import PdfReader
@@ -48,8 +49,6 @@ for message in st.session_state.messages:
         st.write(message["content"])
 
 # Function for generating LLM response
-
-
 def generate_response(prompt_input, email, passwd):
     # Hugging Face Login
     sign = Login(email, passwd)
@@ -58,26 +57,25 @@ def generate_response(prompt_input, email, passwd):
     chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
     return chatbot.chat(prompt_input)
 
-
 # User-provided prompt
 if prompt := st.chat_input(disabled=not (hf_email and hf_pass)):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.write(prompt)
-        
+
 # Generate a new response if last message is not from assistant
 if st.session_state.messages[-1]["role"] != "assistant":
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
             try:
-                response = generate_response(prompt, hf_email, hf_pass, model_name)
+                response = generate_response(prompt, hf_email, hf_pass)
                 st.write(response)
             except ChatError as e:
                 st.error(f"ChatError: {e}")
                 st.error("An error occurred while processing the chat response.")
     message = {"role": "assistant", "content": response}
     st.session_state.messages.append(message)
-    
+
 # Handle language input
 if "language" not in st.session_state:
     st.session_state.language = "en"  # Default language is English
