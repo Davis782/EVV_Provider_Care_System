@@ -133,7 +133,6 @@ website_url_1 = 'https://www.freeconferencecall.com/'
 iframe_html_1 = f'<iframe src="{website_url_1}" width="700" height="450"></iframe>'
 st.sidebar.markdown(iframe_html_1, unsafe_allow_html=True)
 
-
 # Define the website URL for video transcript
 website_url = 'https://transcriptal.com/'
 
@@ -157,6 +156,8 @@ if youtube_video_input:
     # For demonstration purposes, you can display a placeholder transcript
     # YouTube video input
     st.write("Transcript: This is a placeholder transcript for the YouTube video.")
+
+
 
 # Initialize Hugchat
 chatbot = None
