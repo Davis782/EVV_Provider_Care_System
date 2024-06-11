@@ -249,4 +249,4 @@ if file_updated or user_input:
 # Show a warning if no file or user input has been updated
 if not file_updated and not user_input:
     st.warning(
-        "Please click on '>' in the upper left hand cornder to 1. upload a document or enter a text below or a YouTube video, provide a URL above to generate a response.")
+        "Please click on '>' in the upper left hand cornder to 1. upload a document or 2. enter a text below or 3. Enter a YouTube video, provide a URL above to generate a response.")
