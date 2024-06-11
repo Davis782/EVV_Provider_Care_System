@@ -127,7 +127,7 @@ if url_input:
 
 # Link for FreeConference Call Tool
 # Define the website URL for video transcript
-website_url_1 = 'https://www.freeconferencecall.com/profile'
+website_url_1 = 'https://www.llamaindex.ai/open-source'
 
 # Create an iframe and embed it in the Streamlit app
 iframe_html_1 = f'<iframe src="{website_url_1}" width="700" height="450"></iframe>'
