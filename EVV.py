@@ -64,16 +64,20 @@ if prompt := st.chat_input(disabled=not (hf_email and hf_pass)):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.write(prompt)
-
+        
 # Generate a new response if last message is not from assistant
 if st.session_state.messages[-1]["role"] != "assistant":
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
-            response = generate_response(prompt, hf_email, hf_pass)
-            st.write(response)
+            try:
+                response = generate_response(prompt, hf_email, hf_pass, model_name)
+                st.write(response)
+            except ChatError as e:
+                st.error(f"ChatError: {e}")
+                st.error("An error occurred while processing the chat response.")
     message = {"role": "assistant", "content": response}
     st.session_state.messages.append(message)
-
+    
 # Handle language input
 if "language" not in st.session_state:
     st.session_state.language = "en"  # Default language is English
