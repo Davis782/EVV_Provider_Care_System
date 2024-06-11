@@ -63,6 +63,10 @@ if prompt := st.chat_input(disabled=not (hf_email and hf_pass)):
     with st.chat_message("user"):
         st.write(prompt)
 
+# Define a simple Message class for demonstration purposes
+class Message:
+    def __init__(self, content):
+        self.content = content
 
 # Function to insert line breaks into long strings
 def insert_line_breaks(text, max_line_length=75):
