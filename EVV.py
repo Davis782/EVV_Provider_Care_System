@@ -125,13 +125,13 @@ if url_input:
     user_input += f"URL: {url_input}\n"
 
 
-
+# Link for FreeConference Call Tool
 # Define the website URL for video transcript
 website_url_1 = 'https://www.freeconferencecall.com/'
 
 # Create an iframe and embed it in the Streamlit app
 iframe_html_1 = f'<iframe src="{website_url_1}" width="700" height="450"></iframe>'
-    st.markdown(iframe_html_1, unsafe_allow_html=True)
+st.sidebar.markdown(iframe_html_1, unsafe_allow_html=True)
 
 
 # Define the website URL for video transcript
