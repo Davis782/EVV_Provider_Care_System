@@ -43,10 +43,19 @@ if "messages" not in st.session_state.keys():
     st.session_state.messages = [
         {"role": "assistant", "content": "How may I help you?"}]
 
+# # Display chat messages
+# for message in st.session_state.messages:
+#     with st.chat_message(message["role"]):
+#         st.write(message["content"])
+
 # Display chat messages
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
-        st.write(message["content"])
+        if "content" in message:
+            st.write(message["content"])
+        else:
+            st.write("No content available.")
+
 
 # Function for generating LLM response
 def generate_response(prompt_input, email, passwd):
@@ -81,18 +90,36 @@ def insert_line_breaks(text, max_line_length=75):
     else:
         return str(text)  # Convert to string if the type is not recognized
 
+# # Generate a new response if last message is not from assistant
+# if st.session_state.messages[-1]["role"] != "assistant":
+#     with st.chat_message("assistant"):
+#         with st.spinner("Thinking..."):
+#             try:
+#                 response = generate_response(prompt, hf_email, hf_pass)
+#                 response = insert_line_breaks(response)  # Insert line breaks into response
+#                 st.write(response)
+#             except ChatError as e:
+#                 st.error(f"ChatError: {e}")
+#                 st.error("An error occurred while processing the chat response.")
+#     message = {"role": "assistant", "content": response}
+#     st.session_state.messages.append(message)
+
 # Generate a new response if last message is not from assistant
+
 if st.session_state.messages[-1]["role"] != "assistant":
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
             try:
                 response = generate_response(prompt, hf_email, hf_pass)
-                response = insert_line_breaks(response)  # Insert line breaks into response
-                st.write(response)
-            except ChatError as e:
-                st.error(f"ChatError: {e}")
-                st.error("An error occurred while processing the chat response.")
-    message = {"role": "assistant", "content": response}
+                if response:
+                    response = insert_line_breaks(response)  # Insert line breaks into response
+                    message = {"role": "assistant", "content": response}
+                else:
+                    message = {"role": "assistant", "content": "Sorry, I couldn't generate a response."}
+            except Exception as e:
+                st.error(f"An error occurred: {e}")
+                message = {"role": "assistant", "content": "An error occurred while generating the response."}
+
     st.session_state.messages.append(message)
 
 
