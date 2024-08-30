@@ -118,7 +118,7 @@ if st.session_state.messages[-1]["role"] != "assistant":
                     message = {"role": "assistant", "content": "Sorry, I couldn't generate a response."}
             except Exception as e:
                 st.error(f"An error occurred: {e}")
-        message = {"role": "assistant", "content": "An error occurred while generating the response."}
+    message = {"role": "assistant", "content": "An error occurred while generating the response."}
 
     st.session_state.messages.append(message)
 
