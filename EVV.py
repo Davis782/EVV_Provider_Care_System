@@ -56,15 +56,27 @@ for message in st.session_state.messages:
         else:
             st.write("No content available.")
 
-
 # Function for generating LLM response
 def generate_response(prompt_input, email, passwd):
-    # Hugging Face Login
-    sign = Login(email, passwd)
-    cookies = sign.login()
-    # Create ChatBot
-    chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
-    return chatbot.chat(prompt_input)
+    try:
+        # Hugging Face Login
+        sign = Login(email, passwd)
+        cookies = sign.login()
+
+        if not cookies:
+            st.error("Failed to log in. Please check your credentials.")
+            return
+
+        # Create ChatBot
+        chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
+        response = chatbot.chat(prompt_input)
+
+        return response
+    except requests.exceptions.RequestException as e:
+        st.error(f"Request error: {e}")
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
+
 
 # User-provided prompt
 if prompt := st.chat_input(disabled=not (hf_email and hf_pass)):
