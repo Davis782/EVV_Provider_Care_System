@@ -7,6 +7,7 @@ import docx
 from PyPDF2 import PdfReader
 import sqlite3
 import os
+import requests  # Import requests libra
 
 # Initialize variables
 user_input = ""  # Initialize user_input as an empty string
