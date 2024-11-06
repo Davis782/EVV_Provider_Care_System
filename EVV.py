@@ -58,25 +58,34 @@ for message in st.session_state.messages:
             st.write("No content available.")
 
 # Function for generating LLM response
+
 def generate_response(prompt_input, email, passwd):
     try:
         # Hugging Face Login
         sign = Login(email, passwd)
         cookies = sign.login()
-
-        if not cookies:
-            st.error("Failed to log in. Please check your credentials.")
-            return
-
         # Create ChatBot
         chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
+
+        # Get the response
         response = chatbot.chat(prompt_input)
 
-        return response
+        # Check if the response is valid JSON
+        if isinstance(response, str):
+            try:
+                json_response = json.loads(response)
+                return json_response
+            except json.JSONDecodeError as json_error:
+                st.error(f"JSON decode error: {json_error}")
+                st.error(f"Raw response: {response}")
+        else:
+            return response
     except requests.exceptions.RequestException as e:
         st.error(f"Request error: {e}")
     except Exception as e:
         st.error(f"An error occurred: {e}")
+
+
 
 
 # User-provided prompt
