@@ -58,7 +58,6 @@ for message in st.session_state.messages:
             st.write("No content available.")
 
 # Function for generating LLM response
-
 def generate_response(prompt_input, email, passwd):
     try:
         # Hugging Face Login
@@ -84,7 +83,6 @@ def generate_response(prompt_input, email, passwd):
         st.error(f"Request error: {e}")
     except Exception as e:
         st.error(f"An error occurred: {e}")
-
 
 
 
