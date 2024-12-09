@@ -194,7 +194,7 @@ if url_input:
 
 # Link for ottodev-bolt.myaibuilt App Building Tool
 # Define the website URL for App Building Tool
-website_url_1 = 'https://ottodev-bolt.myaibuilt.app/'
+website_url_2 = 'https://ottodev-bolt.myaibuilt.app/'
 
 # Create a clickable link to the website
 st.sidebar.markdown(f"[App Building Tool]({website_url_2})", unsafe_allow_html=True)
