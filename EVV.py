@@ -190,6 +190,16 @@ url_input = st.text_input("Enter a URL:", key="url_input")
 if url_input:
     user_input += f"URL: {url_input}\n"
 
+
+
+# Link for ottodev-bolt.myaibuilt App Building Tool
+# Define the website URL for App Building Tool
+website_url_1 = 'https://ottodev-bolt.myaibuilt.app/'
+
+# Create a clickable link to the website
+st.sidebar.markdown(f"[App Building Tool]({website_url_2})", unsafe_allow_html=True)
+
+
 # Link for FreeConference Call Tool
 # Define the website URL for video transcript
 website_url_1 = 'https://www.freeconferencecall.com/'
