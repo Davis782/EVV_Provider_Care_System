@@ -117,7 +117,7 @@ if "language" not in st.session_state:
     st.session_state.language = "en"  # Initialize language to English
 
 # Upload .db file and Google Sheets ID
-uploaded_db_file = st.sidebar.file Uploader(
+uploaded_db_file = st.sidebar.file_Uploader(
     "Upload a .db file", type=["db"], key="db_file")
 google_sheets_id = st.sidebar.text_input(
     "Enter Google Sheets ID:", key="google_sheets_id")
