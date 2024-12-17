@@ -255,20 +255,20 @@ if file_updated or user_input:
                     conn = sqlite3.connect(sqlite_filepath)
                     cursor = conn.cursor()
                     # Perform append operation here
-                    st.write(
-                        "Data appended to existing SQLite file: " + sqlite_filepath)
-            else:
-                # Create a new database
-                conn = sqlite3.connect(sqlite_filepath)
-                cursor = conn.cursor()
-                # Perform initial database setup here
-                st.write(
-                    "New SQLite file created in the working directory: " + sqlite_filepath)
+                    st.write("Data appended to existing SQLite file: " + sqlite_filepath)
+                else:
+                    # Create a new database
+                    conn = sqlite3.connect(sqlite_filepath)
+                    cursor = conn.cursor()
+                    # Perform initial database setup here
+                    st.write("New SQLite file created in the working directory: " + sqlite_filepath)
+            
+                conn.commit()
+                conn.close()
+            except Exception as e:
+                st.error(f"Error accessing the SQLite file: {e}")
 
-            conn.commit()
-            conn.close()
-        except Exception as e:
-            st.error(f"Error accessing the SQLite file: {e}")
+
     else:
         st.error("Invalid email address format")
 
