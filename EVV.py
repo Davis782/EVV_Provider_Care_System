@@ -126,7 +126,8 @@ if file_updated or user_input:
             cookies = sign.login()
             # Initialize Hugchat with credentials
             chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
-            response = chatbot.chat(user_input, language=st.session_state.language)
+            response = chatbot.chat(
+                user_input, language=st.session_state.language)
 
             # Add Hugchat response to chat history
             chat_history.append(("Hugchat", response))
@@ -135,3 +136,54 @@ if file_updated or user_input:
             st.subheader("Chat History")
             for sender, message in chat_history:
                 st.text_area(f"{sender}: {message}")
+
+    # Get the email input from the user
+    email = st.text_input("Enter your email address:", key="email_input")
+
+    if email:
+        # Check if the email address is in the correct format
+        if "@" in email and "." in email.split("@")[1]:
+            # Split the email address on "@" and "."
+            parts = email.split('@')
+            username = parts[0]
+            domain = parts[1].split('.')[0]
+
+            # Concatenate to create the SQLite file name
+            sqlite_filename = f"{username}_{domain}.db"
+
+            # Get the current working directory
+            current_directory = os.getcwd()
+
+            # Save the SQLite file in the current working directory
+            sqlite_filepath = os.path.join(current_directory, sqlite_filename)
+
+            try:
+                # Check if the file already exists
+                if os.path.exists(sqlite_filepath):
+                    # Append to the existing database
+                    conn = sqlite3.connect(sqlite_filepath)
+                    cursor = conn.cursor()
+                    # Perform append operation here
+                    st.write(
+                        "Data appended to existing SQLite file: " + sqlite_filepath)
+                else:
+                    # Create a new database
+                    conn = sqlite3.connect(sqlite_filepath)
+                    cursor = conn.cursor()
+                    # Perform initial database setup here
+                    st.write(
+                        "New SQLite file created in the working directory: " + sqlite_filepath)
+
+                conn.commit()
+                conn.close()
+            except Exception as e:
+                st.error(f"Error accessing the SQLite file: {e}")
+        else:
+            st.error("Invalid email address format")
+
+        # Send email to the user (you can implement this functionality using an email service)
+
+# Show a warning if no file or user input has been updated
+if not file_updated and not user_input:
+    st.warning(
+        "Please click on '>' in the upper left hand corner to 1. upload a document or 2. enter a text below or 3. Enter a YouTube video, provide a URL above to generate a response.")
