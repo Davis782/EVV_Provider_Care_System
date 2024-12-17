@@ -8,6 +8,7 @@ from PyPDF2 import PdfReader
 import sqlite3
 import os
 import requests  # Import requests library
+import json  # Ensure you have this import for JSON handling
 
 # Initialize variables
 user_input = ""  # Initialize user_input as an empty string
@@ -37,7 +38,6 @@ with st.sidebar:
             st.success('Proceed to entering your prompt message!', icon='  ')
     st.markdown(
         'The Exact Solution of Pi and What it Means website [blog](https://exact-solution-of-pi.onrender.com/)')
-
 
 # Store LLM generated responses
 if "messages" not in st.session_state.keys():
@@ -93,117 +93,26 @@ def insert_line_breaks(text, max_line_length=75):
         for i in range(0, len(text), max_line_length):
             lines.append(text[i:i+max_line_length])
         return '\n'.join(lines)
-    elif isinstance(text, Message):  # Assuming Message is the type of the response object
-        return text  # Return the Message object as it is
     else:
         return str(text)  # Convert to string if the type is not recognized
 
-# Generate a new response if last message is not from assistant
-if st.session_state.messages[-1]["role"] != "assistant":
-    with st.chat_message("assistant"):
-        with st.spinner("Thinking..."):
-            try:
-                response = generate_response(prompt, hf_email, hf_pass)
-                response = insert_line_breaks(response)  # Insert line breaks into response
-                st.write(response)
-            except ChatError as e:
-                st.error(f"ChatError: {e}")
-                st.error("An error occurred while processing the chat response.")
-    message = {"role": "assistant", "content": response}
-    st.session_state.messages.append(message)
-
-# Handle language input
-if "language" not in st.session_state:
-    st.session_state.language = "en"  # Initialize language to English
-
-# Upload .db file and Google Sheets ID
-uploaded_db_file = st.sidebar.file_uploader(
-    "Upload a .db file", type=["db"], key="db_file")
-google_sheets_id = st.sidebar.text_input(
-    "Enter Google Sheets ID:", key="google_sheets_id")
-
-# User input: Upload multiple documents
-uploaded_files = st.sidebar.file_uploader(
-    "Upload multiple documents", accept_multiple_files=True)
-
-# Process uploaded documents
-if uploaded_files:
-    file_updated = True
-    for idx, uploaded_file in enumerate(uploaded_files):
-        file_type = uploaded_file.type
-        if file_type == 'text/plain':
-            document_text = uploaded_file.getvalue().decode("utf-8", errors='replace')
-            user_input += document_text
-        elif file_type == 'application/pdf':
-            pdf_reader = PdfReader(uploaded_file)
-            num_pages = len(pdf_reader.pages)
-            for page_num in range(num_pages):
-                page = pdf_reader.pages[page_num]
-                document_text = page.extract_text()
-                user_input += document_text
-        elif file_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-            doc = docx.Document(uploaded_file)
-            document_text = '\n'.join(
-                [paragraph.text for paragraph in doc.paragraphs])
-            user_input += document_text
-        elif file_type == 'text/csv':
-            df = pd.read_csv(uploaded_file)
-            document_text = df.to_string(index=False)
-            user_input += document_text
-        elif file_type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-            df = pd.read_excel(uploaded_file)
-            document_text = df.to_string(index=False)
-            user_input += document_text
-
-# URL input
+# Handle URL input
 url_input = st.text_input("Enter a URL:", key="url_input")
 if url_input:
     user_input += f"URL: {url_input}\n"
-    # Ask questions about the URL
-    st.write("Please answer the following questions about the URL:")
-    url_question_1 = st.text_input("What is the purpose of this URL?", key="url_question_1")
-    url_question_2 = st.text_input("What information do you expect to find at this URL?", key="url_question_2")
-    if url_question_1 and url_question_2:
-        user_input += f"URL Purpose: {url_question_1}\n"
-        user_input += f"Expected Information: {url_question_2}\n"
-
-# Link for ottodev-bolt.myaibuilt App Building Tool
-# Define the website URL for App Building Tool
-website_url_2 = 'https://ottodev-bolt.myaibuilt.app/'
-
-# Create a clickable link to the website
-st.sidebar.markdown(f"[App Building Tool]({website_url_2})", unsafe_allow_html=True)
-
-# Link for FreeConference Call Tool
-# Define the website URL for video transcript
-website_url_1 = 'https://www.freeconferencecall.com/'
-
-# Create a clickable link to the website
-st.sidebar.markdown(f"[FreeConference Call Tool]({website_url_1})", unsafe_allow_html=True)
-
-# Define the website URL for video transcript
-website_url = 'https://transcriptal.com/'
-
-# Create an iframe and embed it in the Streamlit app
-iframe_html = f'<iframe src="{website_url}" width="700" height="450"></iframe>'
-
-# Display the YouTube video URL input field
-youtube_video_input = st.text_input(
-    "Enter a YouTube video URL:", key="youtube_video_input")
-
-# Check if the user has entered a YouTube video URL
-if youtube_video_input:
-    # Embed the website with the YouTube video
-    st.markdown(iframe_html, unsafe_allow_html=True)
-    # Display the YouTube video URL
-    st.write(f"YouTube Video URL: {youtube_video_input}")
-
-    # Add functionality to execute transcript for the YouTube video here
-    # This can include calling an API or service to generate the transcript
-
-    # For demonstration purposes, you can display a placeholder transcript
-    # YouTube video input
-    st.write("Transcript: This is a placeholder transcript for the YouTube video.")
+    # Generate a response based on the URL
+    with st.spinner("Fetching information from the URL..."):
+        try:
+            # You can customize the prompt to ask for information about the URL
+            url_response = generate_response(f"Provide information about the following URL: {url_input}", hf_email, hf_pass)
+            if url_response:
+                url_response = insert_line_breaks(url_response)  # Insert line breaks into response
+                st.write(url_response)
+                st.session_state.messages.append({"role": "assistant", "content": url_response})
+            else:
+                st.write("No response generated for the URL.")
+        except Exception as e:
+            st.error(f"Error fetching information from the URL: {e}")
 
 # Initialize Hugchat
 chatbot = None
@@ -217,8 +126,7 @@ if file_updated or user_input:
             cookies = sign.login()
             # Initialize Hugchat with credentials
             chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
-            response = chatbot.chat(
-                user_input, language=st.session_state.language)
+            response = chatbot.chat(user_input, language=st.session_state.language)
 
             # Add Hugchat response to chat history
             chat_history.append(("Hugchat", response))
@@ -227,49 +135,3 @@ if file_updated or user_input:
             st.subheader("Chat History")
             for sender, message in chat_history:
                 st.text_area(f"{sender}: {message}")
-
-    # Get the email input from the user
-    email = st.text_input("Enter your email address:", key="email_input")
-
-    if email:
-        # Check if the email address is in the correct format
-        if "@" in email and "." in email.split("@")[1]:
-            # Split the email address on "@" and "."
-            parts = email.split('@')
-            username = parts[0]
-            domain = parts[1].split('.')[0]
-
-            # Concatenate to create the SQLite file name
-            sqlite_filename = f"{username}_{domain}.db"
-
-            # Get the current working directory
-            current_directory = os.getcwd()
-
-            # Save the SQLite file in the current working directory
-            sqlite_filepath = os.path.join(current_directory, sqlite_filename)
-
-            try:
-                # Check if the file already exists
-                if os.path.exists(sqlite_filepath):
-                    # Append to the existing database
-                    conn = sqlite3.connect(sqlite_filepath)
-                    cursor = conn.cursor()
-                    # Perform append operation here
-                    st.write("Data appended to existing SQLite file: " + sqlite_filepath)
-                else:
-                    # Create a new database
-                    conn = sqlite3.connect(sqlite_filepath)
-                    cursor = conn.cursor()
-                    # Perform initial database setup here
-                    st.write("New SQLite file created in the working directory: " + sqlite_filepath)
-            
-                conn.commit()
-                conn.close()
-            except Exception as e:
-                st.error(f"Error accessing the SQLite file: {e}")
-
-
-    else:
-        st.error("Invalid email address format")
-
-    # Send email to the user (you can implement this functionality
