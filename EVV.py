@@ -7,7 +7,7 @@ import docx
 from PyPDF2 import PdfReader
 import sqlite3
 import os
-import requests  # Import requests libra
+import requests  # Import requests library
 
 # Initialize variables
 user_input = ""  # Initialize user_input as an empty string
@@ -44,11 +44,6 @@ if "messages" not in st.session_state.keys():
     st.session_state.messages = [
         {"role": "assistant", "content": "How may I help you?"}]
 
-# # Display chat messages
-# for message in st.session_state.messages:
-#     with st.chat_message(message["role"]):
-#         st.write(message["content"])
-
 # Display chat messages
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
@@ -84,18 +79,11 @@ def generate_response(prompt_input, email, passwd):
     except Exception as e:
         st.error(f"An error occurred: {e}")
 
-
-
 # User-provided prompt
 if prompt := st.chat_input(disabled=not (hf_email and hf_pass)):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.write(prompt)
-
-# Define a simple Message class for demonstration purposes
-class Message:
-    def __init__(self, content):
-        self.content = content
 
 # Function to insert line breaks into long strings
 def insert_line_breaks(text, max_line_length=75):
@@ -124,30 +112,12 @@ if st.session_state.messages[-1]["role"] != "assistant":
     message = {"role": "assistant", "content": response}
     st.session_state.messages.append(message)
 
-# # Generate a new response if last message is not from assistant
-# if st.session_state.messages[-1]["role"] != "assistant":
-#     with st.chat_message("assistant"):
-#         with st.spinner("Thinking..."):
-#             try:
-#                 response = generate_response(prompt, hf_email, hf_pass)
-#                 if response:
-#                     response = insert_line_breaks(response)  # Insert line breaks into response
-#                     message = {"role": "assistant", "content": response}
-#                 else:
-#                     message = {"role": "assistant", "content": "Sorry, I couldn't generate a response."}
-#             except Exception as e:
-#                 st.error(f"An error occurred: {e}")
-#                 message = {"role": "assistant", "content": "An error occurred while generating the response."}
-#     message = {"role": "assistant", "content": response}
-#     st.session_state.messages.append(message)
-
-
 # Handle language input
 if "language" not in st.session_state:
-    st.session_state.language = "en"  # Default language is English
+    st.session_state.language = "en"  # Initialize language to English
 
 # Upload .db file and Google Sheets ID
-uploaded_db_file = st.sidebar.file_uploader(
+uploaded_db_file = st.sidebar.file Uploader(
     "Upload a .db file", type=["db"], key="db_file")
 google_sheets_id = st.sidebar.text_input(
     "Enter Google Sheets ID:", key="google_sheets_id")
@@ -189,8 +159,13 @@ if uploaded_files:
 url_input = st.text_input("Enter a URL:", key="url_input")
 if url_input:
     user_input += f"URL: {url_input}\n"
-
-
+    # Ask questions about the URL
+    st.write("Please answer the following questions about the URL:")
+    url_question_1 = st.text_input("What is the purpose of this URL?", key="url_question_1")
+    url_question_2 = st.text_input("What information do you expect to find at this URL?", key="url_question_2")
+    if url_question_1 and url_question_2:
+        user_input += f"URL Purpose: {url_question_1}\n"
+        user_input += f"Expected Information: {url_question_2}\n"
 
 # Link for ottodev-bolt.myaibuilt App Building Tool
 # Define the website URL for App Building Tool
@@ -198,7 +173,6 @@ website_url_2 = 'https://ottodev-bolt.myaibuilt.app/'
 
 # Create a clickable link to the website
 st.sidebar.markdown(f"[App Building Tool]({website_url_2})", unsafe_allow_html=True)
-
 
 # Link for FreeConference Call Tool
 # Define the website URL for video transcript
@@ -230,8 +204,6 @@ if youtube_video_input:
     # For demonstration purposes, you can display a placeholder transcript
     # YouTube video input
     st.write("Transcript: This is a placeholder transcript for the YouTube video.")
-
-
 
 # Initialize Hugchat
 chatbot = None
@@ -285,24 +257,19 @@ if file_updated or user_input:
                     # Perform append operation here
                     st.write(
                         "Data appended to existing SQLite file: " + sqlite_filepath)
-                else:
-                    # Create a new database
-                    conn = sqlite3.connect(sqlite_filepath)
-                    cursor = conn.cursor()
-                    # Perform initial database setup here
-                    st.write(
-                        "New SQLite file created in the working directory: " + sqlite_filepath)
+            else:
+                # Create a new database
+                conn = sqlite3.connect(sqlite_filepath)
+                cursor = conn.cursor()
+                # Perform initial database setup here
+                st.write(
+                    "New SQLite file created in the working directory: " + sqlite_filepath)
 
-                conn.commit()
-                conn.close()
-            except Exception as e:
-                st.error(f"Error accessing the SQLite file: {e}")
-        else:
-            st.error("Invalid email address format")
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            st.error(f"Error accessing the SQLite file: {e}")
+    else:
+        st.error("Invalid email address format")
 
-        # Send email to the user (you can implement this functionality using an email service)
-
-# Show a warning if no file or user input has been updated
-if not file_updated and not user_input:
-    st.warning(
-        "Please click on '>' in the upper left hand corner to 1. upload a document or 2. enter a text below or 3. Enter a YouTube video, provide a URL above to generate a response.")
+    # Send email to the user (you can implement this functionality
