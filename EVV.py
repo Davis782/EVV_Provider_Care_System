@@ -2,7 +2,6 @@ import streamlit as st
 from hugchat import hugchat
 from hugchat.login import Login
 from hugchat.message import ChatError  # Import ChatError class
-import pandas as pd
 import docx
 from PyPDF2 import PdfReader
 import sqlite3
@@ -52,9 +51,8 @@ for message in st.session_state.messages:
         else:
             st.write("No content available.")
 
-
 # Handle file uploads
-uploaded_files = st.file_uploader("Upload multiple documents", type=["txt", "pdf", "docx"], accept_multiple_files=True)
+uploaded_files = st.file_uploader("Upload multiple documents", type=["txt", "pdf", "docx", "xlsx"], accept_multiple_files=True)
 
 if uploaded_files:
     for uploaded_file in uploaded_files:
@@ -72,15 +70,20 @@ if uploaded_files:
             doc = docx.Document(uploaded_file)
             doc_text = "\n".join([para.text for para in doc.paragraphs])
             user_input += f"Content from {uploaded_file.name}:\n{doc_text}\n"
-
-
+        elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+            # Read Excel file using built-in methods
+            excel_text = ""
+            for sheet in pd.read_excel(uploaded_file, sheet_name=None):
+                for index, row in sheet.iterrows():
+                    excel_text += f"{row.to String()}\n"
+            user_input += f"Content from {uploaded_file.name}:\n{excel_text}\n"
 
 # Function for generating LLM response
 def generate_response(prompt_input, email, passwd):
     try:
         # Hugging Face Login
         sign = Login(email, passwd)
-        cookies = sign.login()
+        cookies = sign.Login()
         # Create ChatBot
         chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
 
@@ -95,15 +98,15 @@ def generate_response(prompt_input, email, passwd):
             except json.JSONDecodeError as json_error:
                 st.error(f"JSON decode error: {json_error}")
                 st.error(f"Raw response: {response}")
-        else:
-            return response
-    except requests.exceptions.RequestException as e:
-        st.error(f"Request error: {e}")
-    except Exception as e:
-        st.error(f"An error occurred: {e}")
+            else:
+                return response
+        except requests.exceptions.RequestException as e:
+            st.error(f"RequestError: {e}")
+        except Exception as e:
+            st.error(f"AnErrorOccurred: {e}")
 
 # User-provided prompt
-if prompt := st.chat_input(disabled=not (hf_email and hf_pass)):
+if prompt := st.chat_input(disabled=not (hf_email and hf_pass):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.write(prompt)
@@ -114,7 +117,7 @@ def insert_line_breaks(text, max_line_length=75):
     if isinstance(text, str):
         lines = []
         for i in range(0, len(text), max_line_length):
-            lines.append(text[i:i+max_line_length])
+            lines.append(text[i:i + max_lineLength])
         return '\n'.join(lines)
     else:
         return str(text)  # Convert to string if the type is not recognized
@@ -124,12 +127,12 @@ url_input = st.text_input("Enter a URL:", key="url_input")
 if url_input:
     user_input += f"URL: {url_input}\n"
     # Generate a response based on the URL
-    with st.spinner("Fetching information from the URL..."):
+    with st.spinner("Fetching information from the URL:"):
         try:
             # You can customize the prompt to ask for information about the URL
             url_response = generate_response(f"Provide information about the following URL: {url_input}", hf_email, hf_pass)
             if url_response:
-                url_response = insert_line_breaks(url_response)  # Insert line breaks into response
+                url_response = insert_lineBreaks(url_response)  # Insert line breaks into response
                 st.write(url_response)
                 st.session_state.messages.append({"role": "assistant", "content": url_response})
             else:
@@ -137,118 +140,19 @@ if url_input:
         except Exception as e:
             st.error(f"Error fetching information from the URL: {e}")
 
-
-# Link for ottodev-bolt.myaibuilt App Building Tool
-# Define the website URL for App Building Tool
+# Link for ottodev-bolt.myaibuilt App Building tool
+# Define the website URL for app building tool
 website_url_2 = 'https://ottodev-bolt.myaibuilt.app/'
 
 # Create a clickable link to the website
 st.sidebar.markdown(f"[App Building Tool]({website_url_2})", unsafe_allow_html=True)
-
 
 # Link for FreeConference Call Tool
 # Define the website URL for video transcript
 website_url_1 = 'https://www.freeconferencecall.com/'
 
 # Create a clickable link to the website
-st.sidebar.markdown(f"[FreeConference Call Tool]({website_url_1})", unsafe_allow_html=True)
+st.sidebar.markdown(f"[FreeConference Call Tool]({website_url_1})", unsafe Allow Html=True)
 
 # Define the website URL for video transcript
-website_url = 'https://transcriptal.com/'
-
-# Create an iframe and embed it in the Streamlit app
-iframe_html = f'<iframe src="{website_url}" width="700" height="450"></iframe>'
-
-# Display the YouTube video URL input field
-youtube_video_input = st.text_input(
-    "Enter a YouTube video URL:", key="youtube_video_input")
-
-# Check if the user has entered a YouTube video URL
-if youtube_video_input:
-    # Embed the website with the YouTube video
-    st.markdown(iframe_html, unsafe_allow_html=True)
-    # Display the YouTube video URL
-    st.write(f"YouTube Video URL: {youtube_video_input}")
-
-    # Add functionality to execute transcript for the YouTube video here
-    # This can include calling an API or service to generate the transcript
-
-    # For demonstration purposes, you can display a placeholder transcript
-    # YouTube video input
-    st.write("Transcript: This is a placeholder transcript for the YouTube video.")
-
-
-
-# Initialize Hugchat
-chatbot = None
-
-# Generate Response button
-if file_updated or user_input:
-    if st.button("Generate Response", key="generate_response_button"):
-        with st.spinner("Thinking..."):
-            # Hugging Face Login
-            sign = Login(hf_email, hf_pass)
-            cookies = sign.login()
-            # Initialize Hugchat with credentials
-            chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
-            response = chatbot.chat(
-                user_input, language=st.session_state.language)
-
-            # Add Hugchat response to chat history
-            chat_history.append(("Hugchat", response))
-
-            # Display chat history
-            st.subheader("Chat History")
-            for sender, message in chat_history:
-                st.text_area(f"{sender}: {message}")
-
-    # Get the email input from the user
-    email = st.text_input("Enter your email address:", key="email_input")
-
-    if email:
-        # Check if the email address is in the correct format
-        if "@" in email and "." in email.split("@")[1]:
-            # Split the email address on "@" and "."
-            parts = email.split('@')
-            username = parts[0]
-            domain = parts[1].split('.')[0]
-
-            # Concatenate to create the SQLite file name
-            sqlite_filename = f"{username}_{domain}.db"
-
-            # Get the current working directory
-            current_directory = os.getcwd()
-
-            # Save the SQLite file in the current working directory
-            sqlite_filepath = os.path.join(current_directory, sqlite_filename)
-
-            try:
-                # Check if the file already exists
-                if os.path.exists(sqlite_filepath):
-                    # Append to the existing database
-                    conn = sqlite3.connect(sqlite_filepath)
-                    cursor = conn.cursor()
-                    # Perform append operation here
-                    st.write(
-                        "Data appended to existing SQLite file: " + sqlite_filepath)
-                else:
-                    # Create a new database
-                    conn = sqlite3.connect(sqlite_filepath)
-                    cursor = conn.cursor()
-                    # Perform initial database setup here
-                    st.write(
-                        "New SQLite file created in the working directory: " + sqlite_filepath)
-
-                conn.commit()
-                conn.close()
-            except Exception as e:
-                st.error(f"Error accessing the SQLite file: {e}")
-        else:
-            st.error("Invalid email address format")
-
-        # Send email to the user (you can implement this functionality using an email service)
-
-# Show a warning if no file or user input has been updated
-if not file_updated and not user_input:
-    st.warning(
-        "Please click on '>' in the upper left hand corner to 1. upload a document or 2. enter a text below or 3. Enter a YouTube video, provide a URL above to generate a response.")
+website_url = 'https://transcriptal.com
