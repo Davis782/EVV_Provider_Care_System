@@ -5,6 +5,7 @@ from hugchat.message import ChatError
 import docx
 from PyPDF2 import PdfReader
 import pandas as pd
+import xlrd
 import sqlite3
 import os
 import requests
