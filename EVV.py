@@ -52,6 +52,7 @@ for message in st.session_state.messages:
         else:
             st.write("No content available.")
 
+
 # Handle file uploads
 uploaded_files = st.file_uploader("Upload multiple documents", type=["txt", "pdf", "docx"], accept_multiple_files=True)
 
@@ -71,6 +72,8 @@ if uploaded_files:
             doc = docx.Document(uploaded_file)
             doc_text = "\n".join([para.text for para in doc.paragraphs])
             user_input += f"Content from {uploaded_file.name}:\n{doc_text}\n"
+
+
 
 # Function for generating LLM response
 def generate_response(prompt_input, email, passwd):
