@@ -134,6 +134,48 @@ if url_input:
         except Exception as e:
             st.error(f"Error fetching information from the URL: {e}")
 
+
+# Link for ottodev-bolt.myaibuilt App Building Tool
+# Define the website URL for App Building Tool
+website_url_2 = 'https://ottodev-bolt.myaibuilt.app/'
+
+# Create a clickable link to the website
+st.sidebar.markdown(f"[App Building Tool]({website_url_2})", unsafe_allow_html=True)
+
+
+# Link for FreeConference Call Tool
+# Define the website URL for video transcript
+website_url_1 = 'https://www.freeconferencecall.com/'
+
+# Create a clickable link to the website
+st.sidebar.markdown(f"[FreeConference Call Tool]({website_url_1})", unsafe_allow_html=True)
+
+# Define the website URL for video transcript
+website_url = 'https://transcriptal.com/'
+
+# Create an iframe and embed it in the Streamlit app
+iframe_html = f'<iframe src="{website_url}" width="700" height="450"></iframe>'
+
+# Display the YouTube video URL input field
+youtube_video_input = st.text_input(
+    "Enter a YouTube video URL:", key="youtube_video_input")
+
+# Check if the user has entered a YouTube video URL
+if youtube_video_input:
+    # Embed the website with the YouTube video
+    st.markdown(iframe_html, unsafe_allow_html=True)
+    # Display the YouTube video URL
+    st.write(f"YouTube Video URL: {youtube_video_input}")
+
+    # Add functionality to execute transcript for the YouTube video here
+    # This can include calling an API or service to generate the transcript
+
+    # For demonstration purposes, you can display a placeholder transcript
+    # YouTube video input
+    st.write("Transcript: This is a placeholder transcript for the YouTube video.")
+
+
+
 # Initialize Hugchat
 chatbot = None
 
