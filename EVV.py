@@ -1,19 +1,19 @@
 import streamlit as st
 from hugchat import hugchat
 from hugchat.login import Login
-from hugchat.message import ChatError  # Import ChatError class
+from hugchat.message import ChatError
 import docx
 from PyPDF2 import PdfReader
+import pandas as pd
 import sqlite3
 import os
-import requests  # Import requests library
-import json  # Ensure you have this import for JSON handling
+import requests
+import json
 
 # Initialize variables
-user_input = ""  # Initialize user_input as an empty string
-chat_history = []  # Initialize chat history list
-file_updated = False  # Flag to track if a file or .db has been updated
-messages = []  # Initialize chat history list
+user_input = ""
+chat_history = []
+file_updated = False
 
 # App title
 st.set_page_config(page_title="Care System")
@@ -35,21 +35,16 @@ with st.sidebar:
             st.warning('Please enter your credentials!', icon='⚠️')
         else:
             st.success('Proceed to entering your prompt message!', icon='  ')
-    st.markdown(
-        'The Exact Solution of Pi and What it Means website [blog](https://exact-solution-of-pi.onrender.com/)')
+    st.markdown('The Exact Solution of Pi and What it Means website [blog](https://exact-solution-of-pi.onrender.com/)')
 
 # Store LLM generated responses
 if "messages" not in st.session_state.keys():
-    st.session_state.messages = [
-        {"role": "assistant", "content": "How may I help you?"}]
+    st.session_state.messages = [{"role": "assistant", "content": "How may I help you?"}]
 
 # Display chat messages
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
-        if "content" in message:
-            st.write(message["content"])
-        else:
-            st.write("No content available.")
+        st.write(message["content"])
 
 # Handle file uploads
 uploaded_files = st.file_uploader("Upload multiple documents", type=["txt", "pdf", "docx", "xlsx"], accept_multiple_files=True)
@@ -71,26 +66,27 @@ if uploaded_files:
             doc_text = "\n".join([para.text for para in doc.paragraphs])
             user_input += f"Content from {uploaded_file.name}:\n{doc_text}\n"
         elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-            # Read Excel file using built-in methods
             excel_text = ""
-            for sheet in pd.read_excel(uploaded_file, sheet_name=None):
-                for index, row in sheet.iterrows():
-                    excel_text += f"{row.to String()}\n"
+            excel_data = pd.read_excel(uploaded_file, sheet_name=None)
+            for sheet_name, sheet_data in excel_data.items():
+                for index, row in sheet_data.iterrows():
+                    excel_text += f"{row.to_string()}\n"
             user_input += f"Content from {uploaded_file.name}:\n{excel_text}\n"
+
+    # Show the links after a file upload is completed
+    website_url_2 = 'https://ottodev-bolt.myaibuilt.app/'
+    website_url_1 = 'https://www.freeconferencecall.com/'
+    st.sidebar.markdown(f"[App Building Tool]({website_url_2})", unsafe_allow_html=True)
+    st.sidebar.markdown(f"[FreeConference Call Tool]({website_url_1})", unsafe_allow_html=True)
 
 # Function for generating LLM response
 def generate_response(prompt_input, email, passwd):
     try:
-        # Hugging Face Login
         sign = Login(email, passwd)
-        cookies = sign.Login()
-        # Create ChatBot
+        cookies = sign.login()
         chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
-
-        # Get the response
         response = chatbot.chat(prompt_input)
 
-        # Check if the response is valid JSON
         if isinstance(response, str):
             try:
                 json_response = json.loads(response)
@@ -98,15 +94,14 @@ def generate_response(prompt_input, email, passwd):
             except json.JSONDecodeError as json_error:
                 st.error(f"JSON decode error: {json_error}")
                 st.error(f"Raw response: {response}")
-            else:
-                return response
-        except requests.exceptions.RequestException as e:
-            st.error(f"RequestError: {e}")
-        except Exception as e:
-            st.error(f"AnErrorOccurred: {e}")
+            return response
+    except requests.exceptions.RequestException as e:
+        st.error(f"Request error: {e}")
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
 
 # User-provided prompt
-if prompt := st.chat_input(disabled=not (hf_email and hf_pass):
+if prompt := st.chat_input(disabled=not (hf_email and hf_pass)):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.write(prompt)
@@ -117,7 +112,7 @@ def insert_line_breaks(text, max_line_length=75):
     if isinstance(text, str):
         lines = []
         for i in range(0, len(text), max_line_length):
-            lines.append(text[i:i + max_lineLength])
+            lines.append(text[i:i + max_line_length])
         return '\n'.join(lines)
     else:
         return str(text)  # Convert to string if the type is not recognized
@@ -126,13 +121,11 @@ def insert_line_breaks(text, max_line_length=75):
 url_input = st.text_input("Enter a URL:", key="url_input")
 if url_input:
     user_input += f"URL: {url_input}\n"
-    # Generate a response based on the URL
-    with st.spinner("Fetching information from the URL:"):
+    with st.spinner("Fetching information from the URL..."):
         try:
-            # You can customize the prompt to ask for information about the URL
             url_response = generate_response(f"Provide information about the following URL: {url_input}", hf_email, hf_pass)
             if url_response:
-                url_response = insert_lineBreaks(url_response)  # Insert line breaks into response
+                url_response = insert_line_breaks(url_response)  # Insert line breaks into response
                 st.write(url_response)
                 st.session_state.messages.append({"role": "assistant", "content": url_response})
             else:
