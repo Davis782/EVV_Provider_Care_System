@@ -7,7 +7,8 @@ import docx
 from PyPDF2 import PdfReader
 import sqlite3
 import os
-import requests  # Import requests libra
+import requests  # Import requests library
+import json  # Ensure you have this import for JSON handling
 
 # Initialize variables
 user_input = ""  # Initialize user_input as an empty string
@@ -38,16 +39,10 @@ with st.sidebar:
     st.markdown(
         'The Exact Solution of Pi and What it Means website [blog](https://exact-solution-of-pi.onrender.com/)')
 
-
 # Store LLM generated responses
 if "messages" not in st.session_state.keys():
     st.session_state.messages = [
         {"role": "assistant", "content": "How may I help you?"}]
-
-# # Display chat messages
-# for message in st.session_state.messages:
-#     with st.chat_message(message["role"]):
-#         st.write(message["content"])
 
 # Display chat messages
 for message in st.session_state.messages:
@@ -56,6 +51,26 @@ for message in st.session_state.messages:
             st.write(message["content"])
         else:
             st.write("No content available.")
+
+# Handle file uploads
+uploaded_files = st.file_uploader("Upload multiple documents", type=["txt", "pdf", "docx"], accept_multiple_files=True)
+
+if uploaded_files:
+    for uploaded_file in uploaded_files:
+        file_updated = True  # Mark that a file has been updated
+        if uploaded_file.type == "text/plain":
+            content = uploaded_file.read().decode("utf-8")
+            user_input += f"Content from {uploaded_file.name}:\n{content}\n"
+        elif uploaded_file.type == "application/pdf":
+            pdf_reader = PdfReader(uploaded_file)
+            pdf_text = ""
+            for page in pdf_reader.pages:
+                pdf_text += page.extract_text() + "\n"
+            user_input += f"Content from {uploaded_file.name}:\n{pdf_text}\n"
+        elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+            doc = docx.Document(uploaded_file)
+            doc_text = "\n".join([para.text for para in doc.paragraphs])
+            user_input += f"Content from {uploaded_file.name}:\n{doc_text}\n"
 
 # Function for generating LLM response
 def generate_response(prompt_input, email, passwd):
@@ -84,18 +99,11 @@ def generate_response(prompt_input, email, passwd):
     except Exception as e:
         st.error(f"An error occurred: {e}")
 
-
-
 # User-provided prompt
 if prompt := st.chat_input(disabled=not (hf_email and hf_pass)):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.write(prompt)
-
-# Define a simple Message class for demonstration purposes
-class Message:
-    def __init__(self, content):
-        self.content = content
 
 # Function to insert line breaks into long strings
 def insert_line_breaks(text, max_line_length=75):
@@ -105,85 +113,8 @@ def insert_line_breaks(text, max_line_length=75):
         for i in range(0, len(text), max_line_length):
             lines.append(text[i:i+max_line_length])
         return '\n'.join(lines)
-    elif isinstance(text, Message):  # Assuming Message is the type of the response object
-        return text  # Return the Message object as it is
     else:
         return str(text)  # Convert to string if the type is not recognized
-
-# Generate a new response if last message is not from assistant
-if st.session_state.messages[-1]["role"] != "assistant":
-    with st.chat_message("assistant"):
-        with st.spinner("Thinking..."):
-            try:
-                response = generate_response(prompt, hf_email, hf_pass)
-                response = insert_line_breaks(response)  # Insert line breaks into response
-                st.write(response)
-            except ChatError as e:
-                st.error(f"ChatError: {e}")
-                st.error("An error occurred while processing the chat response.")
-    message = {"role": "assistant", "content": response}
-    st.session_state.messages.append(message)
-
-# # Generate a new response if last message is not from assistant
-# if st.session_state.messages[-1]["role"] != "assistant":
-#     with st.chat_message("assistant"):
-#         with st.spinner("Thinking..."):
-#             try:
-#                 response = generate_response(prompt, hf_email, hf_pass)
-#                 if response:
-#                     response = insert_line_breaks(response)  # Insert line breaks into response
-#                     message = {"role": "assistant", "content": response}
-#                 else:
-#                     message = {"role": "assistant", "content": "Sorry, I couldn't generate a response."}
-#             except Exception as e:
-#                 st.error(f"An error occurred: {e}")
-#                 message = {"role": "assistant", "content": "An error occurred while generating the response."}
-#     message = {"role": "assistant", "content": response}
-#     st.session_state.messages.append(message)
-
-
-# Handle language input
-if "language" not in st.session_state:
-    st.session_state.language = "en"  # Default language is English
-
-# Upload .db file and Google Sheets ID
-uploaded_db_file = st.sidebar.file_uploader(
-    "Upload a .db file", type=["db"], key="db_file")
-google_sheets_id = st.sidebar.text_input(
-    "Enter Google Sheets ID:", key="google_sheets_id")
-
-# User input: Upload multiple documents
-uploaded_files = st.sidebar.file_uploader(
-    "Upload multiple documents", accept_multiple_files=True)
-
-# Process uploaded documents
-if uploaded_files:
-    file_updated = True
-    for idx, uploaded_file in enumerate(uploaded_files):
-        file_type = uploaded_file.type
-        if file_type == 'text/plain':
-            document_text = uploaded_file.getvalue().decode("utf-8", errors='replace')
-            user_input += document_text
-        elif file_type == 'application/pdf':
-            pdf_reader = PdfReader(uploaded_file)
-            num_pages = len(pdf_reader.pages)
-            for page_num in range(num_pages):
-                page = pdf_reader.pages[page_num]
-                document_text = page.extract_text()
-                user_input += document_text
-        elif file_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-            doc = docx.Document(uploaded_file)
-            document_text = '\n'.join(
-                [paragraph.text for paragraph in doc.paragraphs])
-            user_input += document_text
-        elif file_type == 'text/csv':
-            df = pd.read_csv(uploaded_file)
-            document_text = df.to_string(index=False)
-            user_input += document_text
-        elif file_type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-            df = pd.read_excel(uploaded_file)
-            document_text = df.to_string(index=False)
-            user_input += document_text
 
 # Handle URL input
 url_input = st.text_input("Enter a URL:", key="url_input")
@@ -202,49 +133,6 @@ if url_input:
                 st.write("No response generated for the URL.")
         except Exception as e:
             st.error(f"Error fetching information from the URL: {e}")
-
-
-
-# Link for ottodev-bolt.myaibuilt App Building Tool
-# Define the website URL for App Building Tool
-website_url_2 = 'https://ottodev-bolt.myaibuilt.app/'
-
-# Create a clickable link to the website
-st.sidebar.markdown(f"[App Building Tool]({website_url_2})", unsafe_allow_html=True)
-
-
-# Link for FreeConference Call Tool
-# Define the website URL for video transcript
-website_url_1 = 'https://www.freeconferencecall.com/'
-
-# Create a clickable link to the website
-st.sidebar.markdown(f"[FreeConference Call Tool]({website_url_1})", unsafe_allow_html=True)
-
-# Define the website URL for video transcript
-website_url = 'https://transcriptal.com/'
-
-# Create an iframe and embed it in the Streamlit app
-iframe_html = f'<iframe src="{website_url}" width="700" height="450"></iframe>'
-
-# Display the YouTube video URL input field
-youtube_video_input = st.text_input(
-    "Enter a YouTube video URL:", key="youtube_video_input")
-
-# Check if the user has entered a YouTube video URL
-if youtube_video_input:
-    # Embed the website with the YouTube video
-    st.markdown(iframe_html, unsafe_allow_html=True)
-    # Display the YouTube video URL
-    st.write(f"YouTube Video URL: {youtube_video_input}")
-
-    # Add functionality to execute transcript for the YouTube video here
-    # This can include calling an API or service to generate the transcript
-
-    # For demonstration purposes, you can display a placeholder transcript
-    # YouTube video input
-    st.write("Transcript: This is a placeholder transcript for the YouTube video.")
-
-
 
 # Initialize Hugchat
 chatbot = None
