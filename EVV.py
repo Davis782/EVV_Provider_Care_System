@@ -1,12 +1,5 @@
 import streamlit as st
-from hugchat import hugchat
-from hugchat.login import Login
-from hugchat.message import ChatError
-import docx
-from PyPDF2 import PdfReader
 import pandas as pd
-import xlrd
-import sqlite3
 import os
 import requests
 import json
@@ -57,21 +50,17 @@ if uploaded_files:
             content = uploaded_file.read().decode("utf-8")
             user_input += f"Content from {uploaded_file.name}:\n{content}\n"
         elif uploaded_file.type == "application/pdf":
-            pdf_reader = PdfReader(uploaded_file)
-            pdf_text = ""
-            for page in pdf_reader.pages:
-                pdf_text += page.extract_text() + "\n"
-            user_input += f"Content from {uploaded_file.name}:\n{pdf_text}\n"
+            # Placeholder for PDF processing
+            user_input += f"Content from {uploaded_file.name}:\n[PDF content not processed in this environment]\n"
         elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-            doc = docx.Document(uploaded_file)
-            doc_text = "\n".join([para.text for para in doc.paragraphs])
-            user_input += f"Content from {uploaded_file.name}:\n{doc_text}\n"
+            # Placeholder for DOCX processing
+            user_input += f"Content from {uploaded_file.name}:\n[DOCX content not processed in this environment]\n"
         elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-            excel_text = ""
             excel_data = pd.read_excel(uploaded_file, sheet_name=None)
+            excel_text = ""
             for sheet_name, sheet_data in excel_data.items():
-                for index, row in sheet_data.iterrows():
-                    excel_text += f"{row.to_string()}\n"
+                excel_text += f"Sheet: {sheet_name}\n"
+                excel_text += sheet_data.to_string(index=False) + "\n"
             user_input += f"Content from {uploaded_file.name}:\n{excel_text}\n"
 
     # Show the links after a file upload is completed
@@ -83,19 +72,10 @@ if uploaded_files:
 # Function for generating LLM response
 def generate_response(prompt_input, email, passwd):
     try:
-        sign = Login(email, passwd)
-        cookies = sign.login()
-        chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
-        response = chatbot.chat(prompt_input)
-
-        if isinstance(response, str):
-            try:
-                json_response = json.loads(response)
-                return json_response
-            except json.JSONDecodeError as json_error:
-                st.error(f"JSON decode error: {json_error}")
-                st.error(f"Raw response: {response}")
-            return response
+        # Placeholder for actual LLM response generation
+        # This is where you would integrate with the LLM API
+        response = f"Response to: {prompt_input}"
+        return response
     except requests.exceptions.RequestException as e:
         st.error(f"Request error: {e}")
     except Exception as e:
@@ -106,6 +86,13 @@ if prompt := st.chat_input(disabled=not (hf_email and hf_pass)):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.write(prompt)
+
+    # Generate response
+    response = generate_response(prompt + "\n" + user_input, hf_email, hf_pass)
+    if response:
+        st.session_state.messages.append({"role": "assistant", "content": response})
+        with st.chat_message("assistant"):
+            st.write(response)
 
 # Function to insert line breaks into long strings
 def insert_line_breaks(text, max_line_length=75):
@@ -146,7 +133,4 @@ st.sidebar.markdown(f"[App Building Tool]({website_url_2})", unsafe_allow_html=T
 website_url_1 = 'https://www.freeconferencecall.com/'
 
 # Create a clickable link to the website
-st.sidebar.markdown(f"[FreeConference Call Tool]({website_url_1})", unsafe Allow Html=True)
-
-# Define the website URL for video transcript
-website_url = 'https://transcriptal.com
+st.sidebar.markdown(f"[FreeConference Call Tool]({website_url_1})", unsafe_allow_html=True)
