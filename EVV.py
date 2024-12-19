@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+import PyPDF2
+import docx
 import os
 import requests
 import json
@@ -8,6 +10,7 @@ import json
 user_input = ""
 chat_history = []
 file_updated = False
+extracted_content = []  # List to store extracted content from files
 
 # App title
 st.set_page_config(page_title="Care System")
@@ -48,33 +51,43 @@ if uploaded_files:
         file_updated = True  # Mark that a file has been updated
         if uploaded_file.type == "text/plain":
             content = uploaded_file.read().decode("utf-8")
-            user_input += f"Content from {uploaded_file.name}:\n{content}\n"
+            extracted_content.append(f"Content from {uploaded_file.name}:\n{content}\n")
         elif uploaded_file.type == "application/pdf":
-            # Placeholder for PDF processing
-            user_input += f"Content from {uploaded_file.name}:\n[PDF content not processed in this environment]\n"
+            # Process PDF file
+            reader = PyPDF2.PdfReader(uploaded_file)
+            pdf_content = ""
+            for page in reader.pages:
+                pdf_content += page.extract_text() + "\n"
+            extracted_content.append(f"Content from {uploaded_file.name}:\n{pdf_content}\n")
         elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-            # Placeholder for DOCX processing
-            user_input += f"Content from {uploaded_file.name}:\n[DOCX content not processed in this environment]\n"
+            # Process DOCX file
+            doc = docx.Document(uploaded_file)
+            doc_content = "\n".join([para.text for para in doc.paragraphs])
+            extracted_content.append(f"Content from {uploaded_file.name}:\n{doc_content}\n")
         elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
             excel_data = pd.read_excel(uploaded_file, sheet_name=None)
             excel_text = ""
             for sheet_name, sheet_data in excel_data.items():
                 excel_text += f"Sheet: {sheet_name}\n"
                 excel_text += sheet_data.to_string(index=False) + "\n"
-            user_input += f"Content from {uploaded_file.name}:\n{excel_text}\n"
+            extracted_content.append(f"Content from {uploaded_file.name}:\n{excel_text}\n")
 
-    # Show the links after a file upload is completed
-    website_url_2 = 'https://ottodev-bolt.myaibuilt.app/'
-    website_url_1 = 'https://www.freeconferencecall.com/'
-    st.sidebar.markdown(f"[App Building Tool]({website_url_2})", unsafe_allow_html=True)
-    st.sidebar.markdown(f"[FreeConference Call Tool]({website_url_1})", unsafe_allow_html=True)
+# Show the links after a file upload is completed
+website_url_2 = 'https://ottodev-bolt.myaibuilt.app/'
+website_url_1 = 'https://www.freeconferencecall.com/'
+st.sidebar.markdown(f"[App Building Tool]({website_url_2})", unsafe_allow_html=True)
+st.sidebar.markdown(f"[FreeConference Call Tool]({website_url_1})", unsafe_allow_html=True)
 
 # Function for generating LLM response
 def generate_response(prompt_input, email, passwd):
     try:
-        # Placeholder for actual LLM response generation
-        # This is where you would integrate with the LLM API
-        response = f"Response to: {prompt_input}"
+        # Here you would integrate with the LLM API to generate a meaningful response
+        # For demonstration, we will simulate a response based on the input
+        if not extracted_content:
+            return "No content extracted from uploaded documents. Please upload documents with text."
+
+        # Simulate processing the prompt and extracted content
+        response = f"Analyzing the following content:\n{prompt_input}\n\nExtracted Content:\n" + "\n".join(extracted_content)
         return response
     except requests.exceptions.RequestException as e:
         st.error(f"Request error: {e}")
@@ -87,8 +100,11 @@ if prompt := st.chat_input(disabled=not (hf_email and hf_pass)):
     with st.chat_message("user"):
         st.write(prompt)
 
+    # Combine user input with extracted content for the LLM
+    combined_input = prompt + "\n" + "\n".join(extracted_content)
+
     # Generate response
-    response = generate_response(prompt + "\n" + user_input, hf_email, hf_pass)
+    response = generate_response(combined_input, hf_email, hf_pass)
     if response:
         st.session_state.messages.append({"role": "assistant", "content": response})
         with st.chat_message("assistant"):
