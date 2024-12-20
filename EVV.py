@@ -221,7 +221,7 @@ website_url_1 = 'https://www.freeconferencecall.com/'
 st.sidebar.markdown(f"[FreeConference Call Tool]({website_url_1})", unsafe_allow_html=True)
 
 # Define the website URL for video transcript
-website_url = 'https://transcriptal.com/'
+website_url = 'https://scribetube.com/'
 
 # Create an iframe and embed it in the Streamlit app
 iframe_html = f'<iframe src="{website_url}" width="700" height="450"></iframe>'
