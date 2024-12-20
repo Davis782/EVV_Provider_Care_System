@@ -7,9 +7,6 @@ import requests
 import json
 
 # Initialize variables
-user_input = ""
-chat_history = []
-file_updated = False
 extracted_content = []  # List to store extracted content from files
 
 # App title
@@ -48,19 +45,16 @@ uploaded_files = st.file_uploader("Upload multiple documents", type=["txt", "pdf
 
 if uploaded_files:
     for uploaded_file in uploaded_files:
-        file_updated = True  # Mark that a file has been updated
         if uploaded_file.type == "text/plain":
             content = uploaded_file.read().decode("utf-8")
             extracted_content.append(f"Content from {uploaded_file.name}:\n{content}\n")
         elif uploaded_file.type == "application/pdf":
-            # Process PDF file
             reader = PyPDF2.PdfReader(uploaded_file)
             pdf_content = ""
             for page in reader.pages:
                 pdf_content += page.extract_text() + "\n"
             extracted_content.append(f"Content from {uploaded_file.name}:\n{pdf_content}\n")
         elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-            # Process DOCX file
             doc = docx.Document(uploaded_file)
             doc_content = "\n".join([para.text for para in doc.paragraphs])
             extracted_content.append(f"Content from {uploaded_file.name}:\n{doc_content}\n")
@@ -81,13 +75,15 @@ st.sidebar.markdown(f"[FreeConference Call Tool]({website_url_1})", unsafe_allow
 # Function for generating LLM response
 def generate_response(prompt_input, email, passwd):
     try:
-        # Here you would integrate with the LLM API to generate a meaningful response
-        # For demonstration, we will simulate a response based on the input
+        # Check if any content was extracted
         if not extracted_content:
-            return "No content extracted from uploaded documents. Please upload documents with text."
+            return "I'm currently unable to access or view any documents that you might have uploaded. Please provide the text of the document or key points from it for analysis."
 
         # Simulate processing the prompt and extracted content
-        response = f"Analyzing the following content:\n{prompt_input}\n\nExtracted Content:\n" + "\n".join(extracted_content)
+        combined_input = prompt_input + "\n" + "\n".join(extracted_content)
+
+        # Here you would integrate with the LLM API to generate a meaningful response
+        response = f"Analyzing the following content:\n{combined_input}"
         return response
     except requests.exceptions.RequestException as e:
         st.error(f"Request error: {e}")
@@ -100,11 +96,8 @@ if prompt := st.chat_input(disabled=not (hf_email and hf_pass)):
     with st.chat_message("user"):
         st.write(prompt)
 
-    # Combine user input with extracted content for the LLM
-    combined_input = prompt + "\n" + "\n".join(extracted_content)
-
     # Generate response
-    response = generate_response(combined_input, hf_email, hf_pass)
+    response = generate_response(prompt, hf_email, hf_pass)
     if response:
         st.session_state.messages.append({"role": "assistant", "content": response})
         with st.chat_message("assistant"):
@@ -124,7 +117,7 @@ def insert_line_breaks(text, max_line_length=75):
 # Handle URL input
 url_input = st.text_input("Enter a URL:", key="url_input")
 if url_input:
-    combined_input += f"URL: {url_input}\n"
+    combined_input = f"URL: {url_input}\n"
     with st.spinner("Fetching information from the URL..."):
         try:
             url_response = generate_response(f"Provide information about the following URL: {url_input}", hf_email, hf_pass)
