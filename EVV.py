@@ -13,7 +13,7 @@ extracted_content = []  # List to store extracted content from files
 st.set_page_config(page_title="Care System")
 
 # Streamlit UI components
-st.title("EVV Provider Care System")
+st.title("EEE Provider Care System")
 
 # Hugging Face Credentials
 with st.sidebar:
