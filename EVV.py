@@ -145,6 +145,10 @@ if url_input:
         except Exception as e:
             st.error(f"Error fetching information from the URL: {e}")
 
+# Link for Trickle App Building Tool
+website_url_3 = 'https://app.trickle.so/project?id=proj_T5ErIh2arF'
+st.sidebar.markdown(f"[App Building Tool]({website_url_3})", unsafe_allow_html=True)
+
 # Link for ottodev-bolt.myaibuilt App Building Tool
 website_url_2 = 'https://ottodev-bolt.myaibuilt.app/'
 st.sidebar.markdown(f"[App Building Tool]({website_url_2})", unsafe_allow_html=True)
