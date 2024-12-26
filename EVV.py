@@ -146,12 +146,17 @@ if url_input:
             st.error(f"Error fetching information from the URL: {e}")
 
 # Link for Trickle App Building Tool
+
+
+website_url_4 = 'https://lovable.dev/projects/d3580e7e-b0b5-484e-bfc9-6edf1cd13241'
+st.sidebar.markdown(f"[I Love this App Building Tool]({website_url_4})", unsafe_allow_html=True)
+
 website_url_3 = 'https://app.trickle.so/project?id=proj_T5ErIh2arF'
-st.sidebar.markdown(f"[App Building Tool]({website_url_3})", unsafe_allow_html=True)
+st.sidebar.markdown(f"[Trickle your thoughts down to this App Building Tool]({website_url_3})", unsafe_allow_html=True)
 
 # Link for ottodev-bolt.myaibuilt App Building Tool
 website_url_2 = 'https://ottodev-bolt.myaibuilt.app/'
-st.sidebar.markdown(f"[App Building Tool]({website_url_2})", unsafe_allow_html=True)
+st.sidebar.markdown(f"[Auto Develpoment power with this App Building Tool]({website_url_2})", unsafe_allow_html=True)
 
 # Link for FreeConference Call Tool
 website_url_1 = 'https://www.freeconferencecall.com/'
